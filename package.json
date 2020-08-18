@@ -1,0 +1,15 @@
+{
+  "name": "wikipedia-speedrunner",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "bent": "7.3.9",
+    "lodash.chunk": "4.2.0",
+    "lodash.uniq": "4.5.0",
+    "sqlite3": "5.0.0"
+  }
+}
