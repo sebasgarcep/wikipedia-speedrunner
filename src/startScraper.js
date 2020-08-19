@@ -13,7 +13,7 @@ async function startScraper({ seed, numWorkers, maxIters, dbPath, batchSize }) {
 
   const WORKER_PATH = path.join(__dirname, 'worker.js');
   async function initWorker() {
-    if (workerPool.length >= numWorkers || iter >= maxIters) { return false; }
+    if (workerPool.length >= numWorkers || (maxIters && iter >= maxIters)) { return false; }
     const target = await database.popQueue();
     if (target.length === 0) { return false; }
     const names = target.map(item => item.name);
@@ -23,7 +23,6 @@ async function startScraper({ seed, numWorkers, maxIters, dbPath, batchSize }) {
       if (type === 'update') {
         const { name, links } = data;
         if (links.length > 0) {
-          console.log(name, links.length);
           await database.createMappings(name, links);
           await database.pushQueue(links);
           startWorkers();

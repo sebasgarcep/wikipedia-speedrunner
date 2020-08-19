@@ -1,6 +1,5 @@
 # TODO
 
-- Debug random stopping point after 2014 Winter Olympics of scrapper.
-- Debug scrapper slowdown.
+- Scrapper slows down once the queue of database transaction grows too large. Fix it.
 - Build naive search algorithm.
 - Build improved version.
