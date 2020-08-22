@@ -25,7 +25,6 @@ async function startScraper({ seed, numWorkers, maxIters, dbPath, batchSize }) {
         if (links.length > 0) {
           console.log(name, links.length);
           await database.createMappings(name, links);
-          await database.pushQueue(links);
           startWorkers();
         }
       } else if (type === 'error') {
