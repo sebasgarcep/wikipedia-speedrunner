@@ -7,22 +7,23 @@ async function startScraper({ seed, numWorkers, maxIters, dbPath, batchSize }) {
   const database = await startDatabase({ dbPath, batchSize });
   await database.pushQueue([seed]);
 
-  // Worker initialization
+  // Static variables
   let iter = 0;
   let workerPool = [];
 
-  const WORKER_PATH = path.join(__dirname, 'worker.js');
-  async function initWorker() {
-    if (workerPool.length >= numWorkers || (maxIters && iter >= maxIters)) { return false; }
-    const target = await database.popQueue();
-    if (target.length === 0) { return false; }
+  function initWorker(target) {
+    // Start worker
     const names = target.map(item => item.name);
-    const worker = fork(WORKER_PATH, names);
+    const workerPath = path.join(__dirname, 'worker.js');
+    const worker = fork(workerPath, names);
+
+    // Define worker event handlers
     worker.on('message', async (message) => {
       const { type, data } = message;
       if (type === 'update') {
         const { name, links } = data;
         if (links.length > 0) {
+          console.log(name, links.length);
           await database.createMappings(name, links);
           await database.pushQueue(links);
           startWorkers();
@@ -31,16 +32,32 @@ async function startScraper({ seed, numWorkers, maxIters, dbPath, batchSize }) {
         console.log('Error:', data.name, data.error);
       }
     });
+
     worker.on('exit', (code) => {
-      if (code !== 0) { console.log('Worker failed!'); } else { startWorkers(worker); }
+      if (code !== 0) {
+        console.log('Worker failed!');
+      } else {
+        deleteWorker(worker);
+        startWorkers();
+      }
     });
-    workerPool.push(worker);
-    return true;
+
+    // Return worker
+    return worker;
   }
 
-  async function startWorkers(deletableWorker) {
-    if (deletableWorker) { workerPool = workerPool.filter(item => item !== deletableWorker); }
-    while (await initWorker()) { iter += 1; }
+  function deleteWorker(worker) {
+    workerPool = workerPool.filter(item => item !== worker);
+  }
+
+  async function startWorkers() {
+    while (workerPool.length < numWorkers && (!maxIters || iter < maxIters)) {
+      const target = await database.popQueue();
+      if (target.length === 0) { return; }
+      const worker = initWorker(target);
+      workerPool.push(worker);
+      iter += 1;
+    }
   }
 
   startWorkers();
