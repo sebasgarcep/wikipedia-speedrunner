@@ -4,9 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dijkstra": "node bin/dijkstra",
+    "dijkstra": "node --max-old-space-size=6000 bin/dijkstra",
     "scrap": "node bin/scrap.js",
-    "traverse": "node bin/traverse.js"
+    "traverse": "node --max-old-space-size=6000 bin/traverse.js"
   },
   "dependencies": {
     "bent": "7.3.9",

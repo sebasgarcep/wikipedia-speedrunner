@@ -1,5 +1,5 @@
 const startDatabase = require('../src/startDatabase');
-const path = require('path');
+const settings = require('../settings');
 
 function randomPick(array) {
   const pos = Math.floor(Math.random() * array.length);
@@ -8,8 +8,8 @@ function randomPick(array) {
 
 async function main() {
   const database = await startDatabase({
-    dbPath: path.join(__dirname, '..', 'data', 'wikipedia.db'),
-    batchSize: 100,
+    dbPath: settings.dbPath,
+    batchSize: settings.batchSize,
   });
   const articles = await database.getReadyArticles();
   let pointer = randomPick(articles);

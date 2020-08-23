@@ -1,23 +1,23 @@
 const startDatabase = require('../src/startDatabase');
-const path = require('path');
 const PriorityQueue = require('../src/PriorityQueue');
+const settings = require('../settings');
 
 async function main() {
   const database = await startDatabase({
-    dbPath: path.join(__dirname, '..', 'data', 'wikipedia.db'),
-    batchSize: 100,
+    dbPath: settings.dbPath,
+    batchSize: settings.batchSize,
   });
   const graph = await database.getGraph();
 
-  const start = 'Off_the_Road';
-  const end = 'Cortlandt,_New_York';
+  const source = settings.source;
+  const target = settings.target;
 
   const queue = new PriorityQueue({ min: true });
   const dist = {};
   const prev = {};
 
-  dist[start] = 0;
-  queue.insert(start, 0);
+  dist[source] = 0;
+  queue.insert(source, 0);
 
   while (!queue.isEmpty()) {
     const current = queue.pop();
@@ -37,8 +37,8 @@ async function main() {
     }
   }
 
-  let current = end;
-  while (current !== start) {
+  let current = target;
+  while (current !== undefined && current !== source) {
     console.log(current);
     current = prev[current];
   }
