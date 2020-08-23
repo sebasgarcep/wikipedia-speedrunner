@@ -109,11 +109,36 @@ async function startDatabase({ dbPath, batchSize }) {
     await pushQueue(linkNames);
   }
 
+  async function getReadyArticles() {
+    const data = await getQuery(database, 'SELECT name FROM articles WHERE state = 2');
+    const articles = data.map(item => item.name);
+    return articles;
+  }
+
+  async function getMappings(name) {
+    const data = await getQuery(database, 'SELECT target_name FROM mappings WHERE source_name = ?', [name]);
+    const mappings = data.map(item => item.target_name);
+    return mappings;
+  }
+
+  async function getGraph() {
+    const data = await getQuery(database, 'SELECT source_name, target_name FROM mappings');
+    const graph = {};
+    for (const { source_name: sourceName, target_name: targetName } of data) {
+      if (!graph[sourceName]) { graph[sourceName] = []; }
+      graph[sourceName].push(targetName);
+    }
+    return graph;
+  }
+
   // Return wrapper object
   return {
     pushQueue,
     popQueue: withLock(popQueue),
     createMappings,
+    getReadyArticles,
+    getMappings,
+    getGraph,
   };
 }
 
