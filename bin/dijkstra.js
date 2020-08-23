@@ -1,6 +1,5 @@
 const startDatabase = require('../src/startDatabase');
 const path = require('path');
-// const { FibonacciHeap: PriorityQueue } = require('@tyriar/fibonacci-heap');
 const PriorityQueue = require('../src/PriorityQueue');
 
 async function main() {
@@ -13,7 +12,7 @@ async function main() {
   const start = 'Off_the_Road';
   const end = 'Cortlandt,_New_York';
 
-  const queue = new PriorityQueue();
+  const queue = new PriorityQueue({ min: true });
   const dist = {};
   const prev = {};
 
