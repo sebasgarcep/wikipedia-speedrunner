@@ -16,10 +16,15 @@ async function getLinks(articleId) {
   return links;
 }
 
+async function wait(ms) {
+  return new Promise(resolve => setTimeout(() => resolve(), ms));
+}
+
 async function main() {
   for (const name of names) {
     try {
       const links = await getLinks(name);
+      await wait(50);
       process.send({ type: 'update', data: { name, links } });
     } catch (error) {
       process.send({ type: 'error', data: { name, error } });
