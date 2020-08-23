@@ -1,12 +1,14 @@
 // Max Priority Queue: Taken from https://en.wikipedia.org/wiki/Binary_heap
 class PriorityQueue {
-  constructor() {
+  constructor({ min } = { min: false }) {
+    this.min = min;
     this.tree = null;
     this.map = new Map();
     this.size = 0;
   }
 
   insert(key, priority) {
+    if (this.min) { priority = -priority; }
     // Define node
     const node = { key, priority, parent: null, left: null, right: null };
     this.map.set(key, node);
@@ -55,6 +57,7 @@ class PriorityQueue {
   }
 
   setPriority(key, priority) {
+    if (this.min) { priority = -priority; }
     const node = this.get(key);
     const previousPriority = node.priority;
     node.priority = priority;
